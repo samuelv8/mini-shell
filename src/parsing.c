@@ -1,7 +1,40 @@
-#include <fcntl.h>
+#include "parsing.h"
 
+#include <assert.h>
+#include <fcntl.h>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <stdlib.h>
+
+#include "job_definitions.h"
+
+token_list *create_token_list() {
+    token_list *l;
+    l = (token_list *)malloc(sizeof(token_list));
+    l->first_token = NULL;
+    l->length = 0;
+    return l;
+}
+
+token *create_token() {
+    token *t;
+    t = (token *)malloc(sizeof(token));
+    t->content = "";
+    t->next = NULL;
+    return t;
+}
+
+void delete_token_list(token_list *l) {
+    token *t, *next_t;
+
+    t = l->first_token;
+    while (t != NULL) {
+        next_t = t->next;
+        free(t);
+        t = next_t;
+    }
+    free(l);
+}
 
 int int_min(int a, int b, int def) {
     return a <= b ? (a > 0 ? a : (b > 0 ? b : def)) : (b > 0 ? b : a);
@@ -19,50 +52,126 @@ int read_input(char *inp) {
     return 0;
 }
 
-int parse_input(char *inp, char **tok) {
+void parse_input(char *inp, token_list *list) {
     char *tmp;
-    int i = 0;
-    for (i = 0; i < TOKENMAX; i++) {
-        tmp = (i == 0) ? strtok(inp, " ") : strtok(NULL, " ");
-        if (tmp == NULL) break;
-        tok[i] = tmp;
-    }
-    return i;
-}
+    token *tok;
 
-int parse_pipe(char **tok, int len, const char *fmt) {
+    tmp = strtok(inp, " ");
+    list->first_token = create_token();
+    tok = list->first_token;
+    tok->content = tmp;
+
     int i;
-    for (i = 0; i < len; i++) {
-        if (strcmp(tok[i], fmt) == 0) break;
-    }
-    return (i < len) ? i : -1;
-}
-
-
-
-void set_argv(char **argv, char **tok, const int start, const int end) {
-    int i;
-    for (i = start; i < end; i++) {
-        argv[i - start] = tok[i];
-    }
-    argv[i - start] = NULL;
-}
-
-void set_file_red(int *flredr, char **tok, int in, int out) {
-    if (in > 0) {
-        if ((flredr[0] = open(tok[in + 1], O_RDONLY)) == -1) {
-            // file input fails
-            printf("\nCan't open selected input file: %s", tok[in + 1]);
-            perror("open");
-            return;
+    for (i = 1; tmp; tok = tok->next) {
+        tmp = strtok(NULL, " ");
+        if (tmp != NULL) {
+            tok->next = create_token();
+            tok->next->content = tmp;
+            i++;
         }
     }
-    if (out > 0) {
-        if ((flredr[1] = open(tok[out + 1], O_WRONLY | O_CREAT)) == -1) {
-            // file output fails
-            printf("\nCan't open selected output file: %s", tok[out + 1]);
-            perror("open");
-            return;
-        }
+    list->length = i;
+}
+
+token *find_str(token_list *list, const char *fmt) {
+    token *tok;
+
+    tok = list->first_token;
+    do {
+        if (strcmp(tok->content, fmt) == 0) break;
+        tok = tok->next;
+    } while (tok != NULL);
+    return tok;
+}
+
+token *find_proc_end(token *first) {
+    token *t;
+
+    t = first;
+    while (t->next != NULL) {
+        if (strcmp(t->next->content, "|") == 0 || strcmp(t->next->content, "<") == 0 ||
+            strcmp(t->next->content, ">") == 0)
+            break;
+        t = t->next;
     }
+    return t;
+}
+
+int find_distance(token *a, token *b) {
+    token *t;
+    int d;
+    assert(a != NULL);
+    assert(b != NULL);
+
+    t = a;
+    d = 0;
+    while (strcmp(t->content, b->content) != 0) {
+        if (t == NULL) return -1;
+        t = t->next;
+        d++;
+    }
+    return d;
+}
+
+char **get_argv(token *first_token, token *last_token) {
+    token *t;
+    int len;
+    char **argv;
+
+    len = find_distance(first_token, last_token);
+    assert(len >= 0);
+    len += 2;
+
+    argv = (char **)malloc(len * sizeof(char *));
+    t = first_token;
+    for (int i = 0; i < len - 1; t = t->next) {
+        argv[i++] = t->content;
+    }
+    argv[len - 1] = NULL;
+
+    return argv;
+}
+
+void fill_job(job *j, token_list *list) {
+    token *first_token, *last_token;
+    process *p;
+    char **argv;
+
+    first_token = list->first_token;
+    last_token = find_proc_end(first_token);
+    argv = get_argv(first_token, last_token);
+    p = create_process(argv);
+    add_process_to_job(j, p);
+    first_token = last_token->next;
+
+    while (first_token != NULL) {
+        first_token = first_token->next;
+        last_token = find_proc_end(first_token);
+        argv = get_argv(first_token, last_token);
+        p = create_process(argv);
+        add_process_to_job(j, p);
+        first_token = last_token->next;
+    }
+}
+
+int set_file_input(char *filepath) {
+    int fd;
+
+    fd = open(filepath, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        return stdin;
+    }
+    return fd;
+}
+
+int set_file_output(char *filepath) {
+    int fd;
+
+    fd = open(filepath, O_WRONLY | O_CREAT);
+    if (fd == -1) {
+        perror("open");
+        return stdout;
+    }
+    return fd;
 }

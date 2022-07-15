@@ -1,22 +1,37 @@
 #ifndef _PARSE_H
 #define _PARSE_H
 
+typedef struct token {
+    char *content;
+    struct token *next;
+} token;
+
+typedef struct {
+    token *first_token;
+    int length;
+} token_list;
+
+token_list *create_token_list(void);
+
+void delete_token_list(token_list *l);
+
 // util function to get last char to be parsed
 int int_min(int, int, int);
 
 // function to read full line
-bool read_input(char *);
+int read_input(char *);
 
 // receives the full line and break it into tokens
-int parse_input(char *, char **);
+void parse_input(char *inp, token_list *list);
 
-// gets pipe position in input if exists
-int parse_pipe(char **, int, const char *);
+/* Finds string fmt in token list,
+   returns NULL if not found.         */
+token *find_str(token_list *list, const char *fmt);
 
-// creates formatted array to execute
-void set_argv(char **, char **, const int, const int);
+void fill_job(job *j, token_list *list);
 
-// open input or output files
-void set_file_red(int *, char **, int, int);
+int set_file_input(char *filepath);
+
+int set_file_output(char *filepath);
 
 #endif
