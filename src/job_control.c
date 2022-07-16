@@ -110,7 +110,7 @@ void do_job_notification(void) {
                 jlast->next = jnext;
             else
                 first_job = jnext;
-            free_job(j);
+            delete_job(j);
         }
 
         /* Notify the user about stopped jobs,

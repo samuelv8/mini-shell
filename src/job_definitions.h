@@ -34,6 +34,8 @@ process *create_process(char **argv);
 /* Creates a job struct.  */
 job *create_job(int infile, int outfile, int errfile);
 
+void delete_job(job *j);
+
 /* Adds job new_j to jobs list.  */
 void add_job(job *new_j);
 

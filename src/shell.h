@@ -3,8 +3,6 @@
 
 #include "parsing.h"
 
-const char *OWN_CMDS[2] = {"exit", "help"};
-
 // initial print
 void print_init();
 

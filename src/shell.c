@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+const char *OWN_CMDS[2] = {"exit", "help"};
 
 void print_init() {
     printf(

@@ -5,11 +5,12 @@
 #include "signal_handling.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 int main() {
     init_shell();
     print_init();
-    char *input;
+    char *input = NULL;
     while (1) {
         /* Waits for input.  */
         if (!read_input(input)) continue;
@@ -27,7 +28,7 @@ int main() {
         in = find_str(tokens, "<");
         out = find_str(tokens, ">");
 
-        int infile = stdin, outfile = stdout;
+        int infile = STDIN_FILENO, outfile = STDOUT_FILENO;
         if (in != NULL) {
             infile = set_file_input(in->next->content);
         }
@@ -37,16 +38,15 @@ int main() {
 
         /* Creates a new job with given tokens.  */
         job *current_job;
-        current_job = create_job(infile, outfile, stderr);
+        current_job = create_job(infile, outfile, STDERR_FILENO);
         add_job(current_job);
 
         /* Finnaly, launches current job in foreground.  */
         launch_job(current_job, 1);
 
-        /* Free alocated space that will be no longer used.  */
+        /* Free alocated space that will be no longer used and updates job list.  */
         delete_token_list(tokens);
-        clean_job_list();
-
+        do_job_notification();
     }
 
     return 0;

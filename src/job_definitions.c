@@ -3,6 +3,7 @@
 
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "job_control.h"
 #include "signal_handling.h"

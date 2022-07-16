@@ -5,6 +5,8 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 token_list *create_token_list() {
     token_list *l;
@@ -158,7 +160,7 @@ int set_file_input(char *filepath) {
     fd = open(filepath, O_RDONLY);
     if (fd == -1) {
         perror("open");
-        return stdin;
+        return STDIN_FILENO;
     }
     return fd;
 }
@@ -169,7 +171,7 @@ int set_file_output(char *filepath) {
     fd = open(filepath, O_WRONLY | O_CREAT);
     if (fd == -1) {
         perror("open");
-        return stdout;
+        return STDOUT_FILENO;
     }
     return fd;
 }
