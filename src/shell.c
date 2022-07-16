@@ -1,5 +1,11 @@
 #include "shell.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+const char *OWN_CMDS[2] = {"exit", "help"};
+
 void print_init() {
     printf(
         "  //---------------------\\\\\n"
@@ -27,11 +33,11 @@ void shell_exit() {
     exit(0);
 }
 
-int check_own_cmd(char **tok) {
-    if (strcmp(tok[0], OWN_CMDS[0]) == 0) {
+int check_own_cmd(token_list *list) {
+    if (strcmp(list->first_token->content, OWN_CMDS[0]) == 0) {
         shell_exit();
     }
-    if (strcmp(tok[0], OWN_CMDS[1]) == 0) {
+    if (strcmp(list->first_token->content, OWN_CMDS[1]) == 0) {
         shell_help();
         return 1;
     }

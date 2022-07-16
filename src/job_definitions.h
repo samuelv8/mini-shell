@@ -3,6 +3,7 @@
 
 #include <termios.h>
 #include <sys/types.h>
+#include <stdlib.h>
 
 /* A process is a single process.  */
 typedef struct process {
@@ -27,18 +28,22 @@ typedef struct job {
 
 /* The active jobs are linked into a list.  This is its head.   */
 job *first_job;
+int jobs_len;
 
 /* Creates a process struct.  */
-process *create_process();
+process *create_process(char **argv);
 
 /* Creates a job struct.  */
-job *create_job();
+job *create_job(int infile, int outfile, int errfile);
 
-/* Adds job J to jobs list.  */
-void add_job(job *j);
+/* Deletes job and its processes.  */
+void delete_job(job *j);
 
-/* Adds process P to job J.  */
-void add_process_to_job(job *j, process *p);
+/* Adds job new_j to jobs list.  */
+void add_job(job *new_j);
+
+/* Adds process new_p to job J.  */
+void add_process_to_job(job *j, process *new_p);
 
 /* Find the active job with the indicated pgid.  */
 job *find_job(pid_t pgid);
@@ -51,5 +56,8 @@ int job_is_completed(job *j);
 
 /* Start a created job in foreground/background.  */
 void launch_job(job *j, int foreground);
+
+/* Function to remove stopped jobs from jobs list.  */
+void clean_job_list();
 
 #endif

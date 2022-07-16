@@ -1,9 +1,10 @@
+#include "job_control.h"
+
 #include <errno.h>
-#include <stdio.h>
 #include <signal.h>
+#include <stdio.h>
 #include <sys/wait.h>
 
-#include "job_definitions.h"
 #include "signal_handling.h"
 
 #define WAIT_ANY (-1)
@@ -109,7 +110,7 @@ void do_job_notification(void) {
                 jlast->next = jnext;
             else
                 first_job = jnext;
-            free_job(j);
+            delete_job(j);
         }
 
         /* Notify the user about stopped jobs,

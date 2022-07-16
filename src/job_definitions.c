@@ -3,12 +3,13 @@
 
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "job_control.h"
 #include "signal_handling.h"
 
 job *first_job = NULL;
-int jobs_len = 0;
+int jobs_len = 1;
 
 process *create_process(char **argv) {
     process *p = (process *)malloc(sizeof(process));
@@ -32,6 +33,41 @@ job *create_job(int infile, int outfile, int errfile) {
     return j;
 }
 
+void delete_job(job *j) {
+    process *p, *next_p;
+
+    p = j->first_process;
+    while (p != NULL) {
+        next_p = p->next;
+        free(p);
+        p = next_p;
+    }
+    free(j);
+}
+
+void clean_job_list() {
+    job *j, *next_j, *prev_j;
+
+    j = first_job;
+    prev_j = NULL;
+    while (j != NULL) {
+        /* Delete completed jobs.  */
+        if (job_is_completed(j)) {
+            next_j = j->next;
+            delete_job(j);
+            if (prev_j) {
+                prev_j->next = next_j;
+            } else {
+                first_job = next_j;
+            }
+            j = next_j;
+        } else {
+            prev_j = j;
+            j = j->next;
+        }
+    }
+}
+
 void add_job(job *new_j) {
     job *j;
 
@@ -50,7 +86,11 @@ void add_process_to_job(job *j, process *new_p) {
 
     for (p = j->first_process; p && p->next; p = p->next)
         ;
-    p->next = new_p;
+    if (p == NULL) {
+        j->first_process = new_p;
+    } else {
+        p->next = new_p;
+    }
 }
 
 job *find_job(pid_t pgid) {
@@ -114,8 +154,8 @@ void launch_process(process *p, pid_t pgid, int infile, int outfile, int errfile
     }
 
     /* Exec the new process.  Make sure we exit.  */
-    execvp(p->argv[0], p->argv);
-    perror("execvp");
+    execv(p->argv[0], p->argv);
+    perror("execv");
     exit(1);
 }
 
