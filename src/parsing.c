@@ -157,7 +157,7 @@ void fill_job(job *j, token_list *list) {
 int set_file_input(char *filepath) {
     int fd;
 
-    fd = open(filepath, O_RDONLY);
+    fd = open(filepath, O_RDONLY, 0777);
     if (fd == -1) {
         perror("open");
         return STDIN_FILENO;
@@ -168,7 +168,7 @@ int set_file_input(char *filepath) {
 int set_file_output(char *filepath) {
     int fd;
 
-    fd = open(filepath, O_WRONLY | O_CREAT);
+    fd = open(filepath, O_CREAT | O_WRONLY, 0777);
     if (fd == -1) {
         perror("open");
         return STDOUT_FILENO;

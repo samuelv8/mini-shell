@@ -9,7 +9,7 @@
 #include "signal_handling.h"
 
 job *first_job = NULL;
-int jobs_len = 0;
+int jobs_len = 1;
 
 process *create_process(char **argv) {
     process *p = (process *)malloc(sizeof(process));

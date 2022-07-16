@@ -3,6 +3,7 @@
 
 #include <termios.h>
 #include <sys/types.h>
+#include <stdlib.h>
 
 /* A process is a single process.  */
 typedef struct process {
@@ -27,6 +28,7 @@ typedef struct job {
 
 /* The active jobs are linked into a list.  This is its head.   */
 job *first_job;
+int jobs_len;
 
 /* Creates a process struct.  */
 process *create_process(char **argv);

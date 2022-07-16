@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "job_control.h"
 #include "job_definitions.h"
@@ -15,6 +16,7 @@ int main() {
     init_shell();
     print_init();
     char *input = (char *)malloc(MAX_INPUT_SIZE * sizeof(char));
+    char *original_input = (char *)malloc(MAX_INPUT_SIZE * sizeof(char));
     while (1) {
         /* Waits for input.  */
         if (!read_input(input)) continue;
@@ -22,6 +24,7 @@ int main() {
         /* Parses input string to a token list.  */
         token_list *tokens;
         tokens = create_token_list();
+        strcpy(original_input, input);
         parse_input(input, tokens);
 
         /* Executes shell cmd.  */
@@ -43,6 +46,8 @@ int main() {
         /* Creates a new job with given tokens.  */
         job *current_job;
         current_job = create_job(infile, outfile, STDERR_FILENO);
+        current_job->command = original_input;
+        fill_job(current_job, tokens);
         add_job(current_job);
 
         /* Finnaly, launches current job in foreground.  */
