@@ -1,9 +1,10 @@
+#include "job_control.h"
+
 #include <errno.h>
-#include <stdio.h>
 #include <signal.h>
+#include <stdio.h>
 #include <sys/wait.h>
 
-#include "job_definitions.h"
 #include "signal_handling.h"
 
 #define WAIT_ANY (-1)
