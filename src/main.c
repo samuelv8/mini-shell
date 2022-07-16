@@ -1,16 +1,20 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "job_control.h"
 #include "job_definitions.h"
 #include "parsing.h"
 #include "shell.h"
 #include "signal_handling.h"
 
-#include <stdio.h>
-#include <unistd.h>
+/* Define max size due to seg fault problems.  */
+#define MAX_INPUT_SIZE 1000
 
 int main() {
     init_shell();
     print_init();
-    char *input = NULL;
+    char *input = (char *)malloc(MAX_INPUT_SIZE * sizeof(char));
     while (1) {
         /* Waits for input.  */
         if (!read_input(input)) continue;
