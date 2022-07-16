@@ -3,16 +3,16 @@
 
 #include "parsing.h"
 
-// initial print
+/* Initial shell print.  */
 void print_init();
 
-// help command execution
+/* Executes help command.  */
 void shell_help();
 
-// exit command execution
+/* Executes exit command.  */
 void shell_exit();
 
-// check if an inputed command is own
+/* Checks if an inputed command is own.  */
 int check_own_cmd(token_list *list);
 
 #endif

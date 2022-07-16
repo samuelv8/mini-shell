@@ -36,6 +36,7 @@ process *create_process(char **argv);
 /* Creates a job struct.  */
 job *create_job(int infile, int outfile, int errfile);
 
+/* Deletes job and its processes.  */
 void delete_job(job *j);
 
 /* Adds job new_j to jobs list.  */
@@ -56,6 +57,7 @@ int job_is_completed(job *j);
 /* Start a created job in foreground/background.  */
 void launch_job(job *j, int foreground);
 
+/* Function to remove stopped jobs from jobs list.  */
 void clean_job_list();
 
 #endif
