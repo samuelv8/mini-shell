@@ -1,6 +1,7 @@
 #include "shell.h"
 
-#include "parsing.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void print_init() {
     printf(

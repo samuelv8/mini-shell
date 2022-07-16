@@ -1,7 +1,10 @@
+#include "signal_handling.h"
+
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "job_definitions.h"
-#include "signal_handling.h"
 
 void init_shell() {
     /* See if we are running interactively.  */

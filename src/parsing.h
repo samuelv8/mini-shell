@@ -1,6 +1,8 @@
 #ifndef _PARSE_H
 #define _PARSE_H
 
+#include "job_definitions.h"
+
 typedef struct token {
     char *content;
     struct token *next;

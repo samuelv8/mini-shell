@@ -6,8 +6,6 @@
 #include <readline/readline.h>
 #include <stdlib.h>
 
-#include "job_definitions.h"
-
 token_list *create_token_list() {
     token_list *l;
     l = (token_list *)malloc(sizeof(token_list));

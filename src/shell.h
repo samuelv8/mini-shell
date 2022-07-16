@@ -1,3 +1,8 @@
+#ifndef _SHELL_H
+#define _SHELL_H
+
+#include "parsing.h"
+
 const char *OWN_CMDS[2] = {"exit", "help"};
 
 // initial print
@@ -10,4 +15,6 @@ void shell_help();
 void shell_exit();
 
 // check if an inputed command is own
-int check_own_cmd(char **);
+int check_own_cmd(token_list *list);
+
+#endif
